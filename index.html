@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bank Exam Quiz</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+}
+
+/* ========================= */
+/* TIMER AREA */
+/* ========================= */
+
+#timer-container{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:#f4f6f9;
+    padding-bottom:10px;
+}
+
+#timer{
+    background:#222;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.timer-buttons{
+    text-align:center;
+}
+
+#pauseBtn,
+#resumeBtn{
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    margin:5px;
+}
+
+#pauseBtn{
+    background:#ff9800;
+    color:white;
+}
+
+#resumeBtn{
+    background:#28a745;
+    color:white;
+}
+
+.question{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.question h3{
+    margin-bottom:15px;
+}
+
+.option{
+    display:block;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.option:hover{
+    background:#f0f0f0;
+}
+
+.selected{
+    background:#cfe2ff;
+    border:2px solid #0d6efd;
+}
+
+.mark-btn{
+    margin-top:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#ff9800;
+    color:white;
+}
+
+.marked{
+    background:#ffcc80 !important;
+}
+
+.review-marked{
+    background:#e0e0e0 !important;
+    border:2px solid #9e9e9e;
+}
+
+.clear-btn{
+    margin-top:10px;
+    margin-left:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#dc3545;
+    color:white;
+}
+
+.submit-btn{
+    width:100%;
+    padding:15px;
+    font-size:20px;
+    border:none;
+    border-radius:10px;
+    background:#28a745;
+    color:white;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+.result-box{
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.review-btn{
+    padding:12px 20px;
+    margin-top:20px;
+    border:none;
+    border-radius:10px;
+    background:#007bff;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.review-question{
+    background:white;
+    padding:20px;
+    margin:20px 0;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.correct{
+    color:green;
+    font-weight:bold;
+}
+
+.wrong{
+    color:red;
+    font-weight:bold;
+}
+
+.unanswered{
+    color:orange;
+    font-weight:bold;
+}
+
+.correct-answer{
+    background:#d4edda;
+    padding:10px;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+.disabled-option{
+    pointer-events:none;
+    opacity:0.6;
+}
+
+.disabled-btn{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Bank Exam MCQ Quiz</h1>
+
+<!-- ========================= -->
+<!-- TIMER -->
+<!-- ========================= -->
+
+<div id="timer-container">
+
+    <div id="timer">
+        Time Left: 20:00
+    </div>
+
+    <div class="timer-buttons">
+
+        <button id="pauseBtn" onclick="pauseTimer()">
+            Pause
+        </button>
+
+        <button id="resumeBtn" onclick="resumeTimer()" disabled>
+            Resume
+        </button>
+
+    </div>
+
+</div>
+
+<div id="quiz"></div>
+
+<button class="submit-btn" onclick="submitQuiz()">
+Submit Quiz
+</button>
+
+</div>
+
+<script>
+
+// ===============================
+// QUESTIONS AREA
+// ===============================
+
+const questions = [
+
+{q:"In June 2026, Uchral Nyam-Osor was elected as the Prime Minister of Mongolia after securing 88 votes (82.2%) in the parliamentary election. Whom did he succeed in this position?", options:["Khurelsukh Ukhnaa","Oyun-Erdene Luvsannamsrai","Zandanshatar Gombojav","Gombojav Zandanshatar"], answer:2},
+
+{q:"Uchral Nyam-Osor became the Prime Minister of which Asian nation after winning 88 votes in the parliamentary election?", options:["Laos","Mongolia","Kazakhstan","Kyrgyzstan"], answer:1},
+
+{q:"Uchral Nyam-Osor secured what percentage of votes to become the Prime Minister of Mongolia?", options:["78.2%","80.4%","82.2%","84.8%"], answer:2},
+
+{q:"The Appointments Committee of the Cabinet (ACC) appointed Vir Vikram Yadav as the Director General (DG) of which organization?", options:["Airports Authority of India (AAI)","Directorate General of Civil Aviation (DGCA)","Bureau of Civil Aviation Security (BCAS)","Air India Limited"], answer:1},
+
+{q:"Vir Vikram Yadav succeeded whom as the Director General of the Directorate General of Civil Aviation (DGCA)?", options:["Arun Kumar","M. Sathiyavathy","Faiz Ahmed Kidwai","Rajiv Bansal"], answer:2},
+
+{q:"The Directorate General of Civil Aviation (DGCA), recently in news due to the appointment of Vir Vikram Yadav, was established in:", options:["1925","1927","1930","1932"], answer:1},
+
+{q:"The headquarters of the Directorate General of Civil Aviation (DGCA) is located in:", options:["Mumbai","Hyderabad","New Delhi","Bengaluru"], answer:2},
+
+{q:"Which airline appointed aviation veteran William Walsh as its new Chief Executive Officer (CEO)?", options:["Air India","SpiceJet","Akasa Air","IndiGo"], answer:3},
+
+{q:"William Walsh succeeded whom as the CEO of IndiGo?", options:["Rahul Bhatia","Ronojoy Dutta","Pieter Elbers","Aditya Ghosh"], answer:2},
+
+{q:"IndiGo, which recently appointed William Walsh as CEO, was founded in:", options:["2004","2005","2006","2007"], answer:2},
+
+{q:"Lieutenant General Dhiraj Seth assumed office as the:", options:["Chief of Army Staff","General Officer Commanding-in-Chief, Southern Command","Vice Chief of the Army Staff","Chief of Integrated Defence Staff"], answer:2},
+
+{q:"Lieutenant General Dhiraj Seth became the ____ Vice Chief of the Army Staff (VCOAS) of the Indian Army.", options:["47th","48th","49th","50th"], answer:2},
+
+{q:"Lt Gen Dhiraj Seth replaced which officer as Vice Chief of the Army Staff?", options:["Manoj Pande","Pushpendra Pal Singh","Upendra Dwivedi","M. V. Suchindra Kumar"], answer:1},
+
+{q:"Who is the current Chief of the Army Staff (COAS) under whom Lt Gen Dhiraj Seth assumed charge as VCOAS?", options:["Manoj Pande","Upendra Dwivedi","Anil Chauhan","Bipin Rawat"], answer:1},
+
+{q:"Min Aung Hlaing was elected as the ____ President of Myanmar by the Pyidaungsu Hluttaw.", options:["9th","10th","11th","12th"], answer:2},
+
+{q:"The legislature of Myanmar that elected Min Aung Hlaing as President is known as:", options:["State Peace Council","National Assembly","Pyidaungsu Hluttaw","House of Representatives"], answer:2},
+
+{q:"How many votes did Min Aung Hlaing secure to become President of Myanmar?", options:["417 of 584","421 of 584","429 of 584","439 of 584"], answer:2},
+
+{q:"Which of the following was elected as one of the Vice-Presidents of Myanmar along with U Nyo Saw?", options:["Aung San Suu Kyi","Nan Ni Ni Aye","Khin Yi","Htin Kyaw"], answer:1},
+
+{q:"Following the resignation of Amarendu Prakash, who took additional charge as Chairman and Managing Director (CMD) of Steel Authority of India Limited (SAIL)?", options:["Soma Mondal","T. V. Narendran","Krishna Kumar Singh","B. P. Rao"], answer:2},
+
+{q:"Krishna Kumar Singh was appointed as interim CMD of SAIL for a period from:", options:["1 April–30 June 2026","2 April–1 July 2026","1 May–31 July 2026","15 April–14 July 2026"], answer:1},
+
+{q:"The interim appointment of Krishna Kumar Singh as CMD of SAIL was approved by:", options:["Ministry of Heavy Industries","Department of Public Enterprises","Ministry of Steel","Ministry of Commerce & Industry"], answer:2},
+
+{q:"Steel Authority of India Limited (SAIL) was established in:", options:["1969","1971","1973","1975"], answer:2},
+
+{q:"Which Maharatna Central Public Sector Enterprise approved Burra Vamsi Rama Mohan as its Chairman and Managing Director (CMD)?", options:["NTPC Limited","NHPC Limited","Power Grid Corporation of India Limited","REC Limited"], answer:2},
+
+{q:"POWERGRID, which recently approved Burra Vamsi Rama Mohan as CMD, was established in:", options:["1987","1988","1989","1990"], answer:2},
+
+{q:"Tô Lâm was re-elected as the President of which Southeast Asian country?", options:["Cambodia","Vietnam","Laos","Thailand"], answer:1},
+
+{q:"Tô Lâm was re-elected President by the:", options:["Central Committee of CPV","Senate of Vietnam","National Assembly of Vietnam","People's Congress"], answer:2},
+
+{q:"Tô Lâm secured what level of support during his re-election as President of Vietnam?", options:["490/500 votes","492/500 votes","495/500 votes","500/500 votes"], answer:2},
+
+{q:"The re-election of Tô Lâm as President granted him a tenure from:", options:["2025–2030","2026–2030","2026–2031","2027–2032"], answer:2},
+
+{q:"During the same session of Vietnam's National Assembly, who was elected as Prime Minister?", options:["Pham Minh Chinh","Vuong Dinh Hue","Le Minh Hung","Tran Thanh Man"], answer:2},
+
+{q:"Tô Lâm also serves as the General Secretary of the:", options:["Lao People's Revolutionary Party","Communist Party of Vietnam","People's Action Party","Vietnam National Front"], answer:1},
+
+{q:"Nasscom Foundation appointed whom as its new Chairperson?", options:["Debjani Ghosh","Salil Parekh","UB Pravin Rao","CP Gurnani"], answer:2},
+
+{q:"UB Pravin Rao succeeded whom as Chairperson of Nasscom Foundation?", options:["Debjani Ghosh","Keshav Murugesh","Rostow Ravanan","Rajesh Nambiar"], answer:2},
+
+{q:"UB Pravin Rao brings over how many years of experience in the technology sector?", options:["25 years","30 years","35 years","40 years"], answer:2},
+
+{q:"Which of the following appointment/election pairs is correctly matched?", options:["Vir Vikram Yadav – POWERGRID CMD","William Walsh – IndiGo CEO","Krishna Kumar Singh – DGCA DG","UB Pravin Rao – President of Vietnam"], answer:1},
+
+{q:"Who among the following was elected through a parliamentary voting process securing 429 out of 584 votes?", options:["Tô Lâm","Uchral Nyam-Osor","Min Aung Hlaing","Le Minh Hung"], answer:2},
+
+{q:"Which organization recently witnessed a leadership change due to the resignation of Amarendu Prakash?", options:["POWERGRID","SAIL","DGCA","IndiGo"], answer:1},
+
+{q:"The abbreviation VCOAS stands for:", options:["Vice Commander of Armed Services","Vice Chief of Army Staff","Vice Chairman of Armed Services","Vice Chief of Administrative Staff"], answer:1},
+
+{q:"Which of the following leaders secured unanimous support from all deputies present during an election?", options:["Min Aung Hlaing","Uchral Nyam-Osor","Tô Lâm","Krishna Kumar Singh"], answer:2},
+
+{q:"The appointment of Vir Vikram Yadav as DG of DGCA was approved by which authority?", options:["Cabinet Secretariat","Civil Aviation Ministry","Appointments Committee of the Cabinet (ACC)","NITI Aayog"], answer:2},
+
+{q:"Which of the following correctly matches the organization with its year of establishment?", options:["DGCA – 1935; POWERGRID – 1991","SAIL – 1973; POWERGRID – 1989","IndiGo – 2008; DGCA – 1925","SAIL – 1975; IndiGo – 2004"], answer:1},
+
+{q:"The Appointments Committee of the Cabinet (ACC) approved the appointment of Sanjay Khanna as Chairman & Managing Director (CMD) of Bharat Petroleum Corporation Limited (BPCL). Prior to this appointment, he was serving as:", options:["Director (Marketing), BPCL","Director (Finance), BPCL","Director (Refineries), BPCL","Director (Human Resources), BPCL"], answer:2},
+
+{q:"Sanjay Khanna, recently appointed CMD of BPCL, possesses over how many years of experience in refinery operations and technical services?", options:["20 years","25 years","30 years","35 years"], answer:2},
+
+{q:"Bharat Petroleum Corporation Limited (BPCL), which recently appointed Sanjay Khanna as CMD, was established in:", options:["1974","1975","1976","1977"], answer:2},
+
+{q:"The headquarters of BPCL is located in:", options:["New Delhi","Mumbai","Chennai","Kolkata"], answer:1},
+
+{q:"Djibouti’s incumbent President Ismaïl Omar Guelleh was re-elected for which consecutive term as President?", options:["Fourth","Fifth","Sixth","Seventh"], answer:2},
+
+{q:"Ismaïl Omar Guelleh contested the presidential election as the candidate of:", options:["Democratic Renewal Party (DRP)","Union for the Presidential Majority (UMP)","Republican Alliance Front (RAF)","National Democratic Congress (NDC)"], answer:1},
+
+{q:"In the Djibouti presidential election, Ismaïl Omar Guelleh secured what percentage of votes?", options:["94.76%","96.42%","97.81%","98.63%"], answer:2},
+
+{q:"Who was defeated by Ismaïl Omar Guelleh in the presidential election of Djibouti?", options:["Ahmed Youssouf","Mohamed Farah Samatar","Hassan Gouled Aptidon","Abdoulkader Kamil Mohamed"], answer:1},
+
+{q:"The voter turnout reported in the Djibouti presidential election was:", options:["75.28%","78.91%","80.33%","82.47%"], answer:2},
+
+{q:"The Parliament of Iraq elected Nizar Mohammed Saeed Amedi as the country’s:", options:["7th President","8th President","9th President","10th President"], answer:2},
+
+{q:"Before being elected President of Iraq, Nizar Mohammed Saeed Amedi served as:", options:["Prime Minister","Minister","Speaker of Parliament","Governor of Baghdad"], answer:1},
+
+{q:"Nizar Mohammed Saeed Amedi succeeded whom as President of Iraq?", options:["Barham Salih","Jalal Talabani","Fuad Masum","Abdul Latif Rashid"], answer:3},
+
+{q:"The decisive voting session that elected Nizar Mohammed Saeed Amedi as President was held in:", options:["Basra","Baghdad","Mosul","Erbil"], answer:1},
+
+{q:"Nizar Mohammed Saeed Amedi became the _____ Iraqi Head of State since 2003.", options:["Fourth","Fifth","Sixth","Seventh"], answer:2},
+
+{q:"Following the resignation of Nitish Kumar, who was sworn in as the 24th Chief Minister (CM) of Bihar?", options:["Vijay Kumar Choudhary","Samrat Choudhary","Bijendra Prasad Yadav","Syed Ata Hasnain"], answer:1},
+
+{q:"Samrat Choudhary became the first leader from which political party to hold the office of Chief Minister of Bihar?", options:["Janata Dal (United)","Rashtriya Janata Dal","Bharatiya Janata Party","Lok Janshakti Party"], answer:2},
+
+{q:"The oath of office to Bihar Chief Minister Samrat Choudhary was administered by:", options:["Arif Mohammed Khan","Rajendra Arlekar","Syed Ata Hasnain","Mangubhai Patel"], answer:2},
+
+{q:"The swearing-in ceremony of Samrat Choudhary as Bihar CM was held at:", options:["Vidhan Sabha, Patna","Gandhi Maidan, Patna","Raj Bhavan, Patna","Secretariat, Patna"], answer:2},
+
+{q:"Which two leaders were sworn in as Deputy Chief Ministers of Bihar along with Samrat Choudhary?", options:["Tejashwi Yadav and Vijay Kumar Sinha","Vijay Kumar Choudhary and Bijendra Prasad Yadav","Dilip Jaiswal and Samrat Choudhary","Nand Kishore Yadav and Tarkishore Prasad"], answer:1},
+
+{q:"The Federation of Indian Chambers of Commerce and Industry (FICCI) appointed whom as its Secretary General?", options:["Rajiv Memani","Harsha Vardhan Agarwal","Anant Swarup","Sanjiv Mehta"], answer:2},
+
+{q:"Prior to becoming Secretary General of FICCI, Anant Swarup served as:", options:["Commerce Secretary","Director General of Trade Remedies","Chief Economic Adviser","Cabinet Secretary"], answer:1},
+
+{q:"Anant Swarup previously served as First Secretary at:", options:["IMF, Washington D.C.","World Bank, Washington D.C.","WTO, Geneva","ADB, Manila"], answer:2},
+
+{q:"FICCI was established in:", options:["1925","1926","1927","1928"], answer:2},
+
+{q:"The headquarters of FICCI is located in:", options:["Mumbai","Bengaluru","New Delhi","Hyderabad"], answer:2},
+
+{q:"HDFC Life reappointed whom as its Managing Director (MD) and Chief Executive Officer (CEO) for a further five-year term?", options:["Keki Mistry","Vibha Padalkar","Deepak Parekh","Sashidhar Jagdishan"], answer:1},
+
+{q:"The reappointment of Vibha Padalkar as MD & CEO of HDFC Life will be effective from:", options:["1 July 2026","1 August 2026","12 September 2026","1 October 2026"], answer:2},
+
+{q:"Vibha Padalkar succeeded whom as CEO of HDFC Life in 2018?", options:["Deepak Parekh","Amitabh Chaudhry","Keki Mistry","Sanjay Tripathy"], answer:1},
+
+{q:"HDFC Life was established in:", options:["1998","1999","2000","2001"], answer:2},
+
+{q:"RBI approved the appointment of Debasish Panda as part-time Chairman of which bank?", options:["AU Small Finance Bank","Karur Vysya Bank","Bandhan Bank","Federal Bank"], answer:2},
+
+{q:"Debasish Panda replaced whom as Chairman of Bandhan Bank?", options:["Chandra Shekhar Ghosh","Anup Kumar Sinha","Partha Pratim Sengupta","Rakesh Makhija"], answer:1},
+
+{q:"Debasish Panda previously served as Chairman of:", options:["SEBI","PFRDA","IRDAI","NABARD"], answer:2},
+
+{q:"Bandhan Bank, recently in news due to RBI’s approval of Debasish Panda’s appointment, is headquartered in:", options:["Mumbai","Chennai","Kolkata","Bhubaneswar"], answer:2},
+
+{q:"Apple Inc. appointed whom as its next Chief Executive Officer (CEO) effective 1 September 2026?", options:["Johny Srouji","Tim Cook","John Ternus","Tom Merieb"], answer:2},
+
+{q:"John Ternus will succeed whom as CEO of Apple Inc.?", options:["Steve Jobs","Tim Cook","Johny Srouji","Luca Maestri"], answer:1},
+
+{q:"Following the appointment of John Ternus as CEO, Tim Cook will assume the role of:", options:["Chairman Emeritus","Executive Chairman","Chief Strategy Officer","President"], answer:1},
+
+{q:"Before being named Apple’s next CEO, John Ternus was serving as:", options:["Chief Operating Officer","Senior Vice President of Hardware Engineering","Chief Technology Officer","Executive Vice President of Products"], answer:1},
+
+{q:"Former Union Minister Dinesh Trivedi was appointed as India’s High Commissioner to:", options:["Nepal","Sri Lanka","Bangladesh","Bhutan"], answer:2},
+
+{q:"Dinesh Trivedi replaced whom as India’s High Commissioner to Bangladesh?", options:["Vikram Doraiswami","Pranay Verma","Riva Ganguly Das","Harsh Vardhan Shringla"], answer:1},
+
+{q:"RBI approved the appointment of Vivek Tripathi as Whole-Time Director (WTD) of AU Small Finance Bank for a period of:", options:["2 years","3 years","4 years","5 years"], answer:1},
+
+{q:"Justice Lisa Gill, recently appointed Chief Justice of Andhra Pradesh High Court, created history by becoming:", options:["Youngest Chief Justice of the High Court","First woman Chief Justice of Andhra Pradesh High Court","First Chief Justice from Punjab & Haryana High Court","First woman judge of Andhra Pradesh High Court"], answer:1},
+
+{q:"The Government of India appointed former Chief Economic Adviser (CEA) Ashok Kumar Lahiri as the Vice Chairman of NITI Aayog. He succeeded:", options:["Rajiv Kumar","Amitabh Kant","Suman Bery","Arvind Panagariya"], answer:2},
+
+{q:"Ashok Kumar Lahiri, recently appointed Vice Chairman of NITI Aayog, was also associated with which constitutional body as a member?", options:["14th Finance Commission","15th Finance Commission","GST Council","Finance Commission Review Committee"], answer:1},
+
+{q:"Which of the following was NOT appointed as a new Full-Time Member of NITI Aayog along with Ashok Kumar Lahiri’s appointment?", options:["K. V. Raju","M. Srinivas","Abhay Karandikar","Arvind Virmani"], answer:3},
+
+{q:"Gobardhan Das was recently appointed to which policy think tank of the Government of India as a Full-Time Member?", options:["Economic Advisory Council to PM","National Development Council","NITI Aayog","National Statistical Commission"], answer:2},
+
+{q:"NITI Aayog, recently in news due to the appointment of Ashok Kumar Lahiri, was established in:", options:["2014","2015","2016","2017"], answer:1},
+
+{q:"Who serves as the Chairperson of NITI Aayog?", options:["Vice President of India","Finance Minister","Prime Minister of India","Cabinet Secretary"], answer:2},
+
+{q:"Dilip Kumar, who assumed charge as Chief Vigilance Officer (CVO) of Steel Authority of India Limited (SAIL), belongs to which service?", options:["Indian Railway Traffic Service (IRTS)","Indian Railway Accounts Service (IRAS)","Indian Railway Service of Mechanical Engineers (IRSME)","Indian Defence Accounts Service (IDAS)"], answer:2},
+
+{q:"Before becoming CVO of SAIL, Dilip Kumar was associated with:", options:["Northern Railway","East Central Railway (ECR)","South Central Railway","Western Railway"], answer:1},
+
+{q:"Which innovation is credited to Dilip Kumar during his tenure in East Central Railway (ECR)?", options:["Vande Bharat Prototype Development","Kavach Signalling System","ISO 9001 Certified Train in ECR","Dedicated Freight Corridor Design"], answer:2},
+
+{q:"Dilip Kumar received the National Award for Outstanding Services in:", options:["2014","2015","2016","2017"], answer:2},
+
+{q:"The Railway Board’s Certificate of Excellence was awarded to Dilip Kumar during:", options:["2016–17","2017–18","2018–19","2019–20"], answer:2},
+
+{q:"SAIL, where Dilip Kumar was appointed as CVO, has its headquarters in:", options:["Mumbai","Kolkata","New Delhi","Bhilai"], answer:2},
+
+{q:"Delhi Metro Rail Corporation (DMRC) appointed Sanjay Jamuar as the first Chief Executive Officer (CEO) of:", options:["Delhi Metro Rail Services Limited","Delhi Metro International Limited (DMIL)","Delhi Metro Global Consultancy Limited","Metro Projects India Limited"], answer:1},
+
+{q:"Prior to this appointment, Sanjay Jamuar belonged to which service?", options:["IRSME","IAS","IRTS","IRSSE"], answer:2},
+
+{q:"Delhi Metro International Limited (DMIL) was established in:", options:["January 2026","March 2026","April 2026","June 2026"], answer:1},
+
+{q:"DMIL has been established as a:", options:["Joint Venture Company","Government Department","Wholly Owned Subsidiary of DMRC","Special Purpose Vehicle of MoHUA"], answer:2},
+
+{q:"The primary objective behind the creation of DMIL is to:", options:["Operate metro services in Delhi","Build freight corridors","Bid for metro projects abroad and expand consultancy services","Manage urban bus networks"], answer:2},
+
+{q:"DMRC was established in:", options:["1993","1994","1995","1996"], answer:2},
+
+{q:"Who was appointed as the Controller General of Defence Accounts (CGDA)?", options:["Bharat Khera","Vishvajit Sahay","Anugraha Narayana Das","Ravi K"], answer:2},
+
+{q:"Vishvajit Sahay was appointed as:", options:["Defence Secretary","Secretary (Defence Finance)","Financial Adviser to Defence Minister","Chairman, Defence Accounts Department"], answer:1},
+
+{q:"Bharat Khera was appointed as Secretary of which Ministry?", options:["Ministry of Commerce & Industry","Ministry of Heavy Industries","Ministry of MSME","Ministry of Labour & Employment"], answer:2},
+
+{q:"Ravi K recently assumed charge as the 22nd Chairman & Managing Director (CMD) of:", options:["BEL","HAL","BEML","MIDHANI"], answer:1},
+
+{q:"Ravi K succeeded whom as CMD of Hindustan Aeronautics Limited (HAL)?", options:["R. Madhavan","C. B. Ananthakrishnan","Dr. D. K. Sunil","T. Suvarna Raju"], answer:2},
+
+{q:"Hindustan Aeronautics Limited (HAL) functions under which ministry?", options:["Ministry of Civil Aviation","Ministry of Heavy Industries","Ministry of Defence","Ministry of Science & Technology"], answer:2},
+
+{q:"HAL was established in:", options:["1938","1939","1940","1941"], answer:2},
+
+{q:"The Appointments Committee approved Rohit Jain as Deputy Governor of:", options:["NABARD","SIDBI","RBI","SEBI"], answer:2},
+
+{q:"Rohit Jain succeeded which RBI Deputy Governor?", options:["M. Rajeshwar Rao","Michael Debabrata Patra","T. Rabi Sankar","Swaminathan J."], answer:2},
+
+{q:"Rohit Jain’s tenure as RBI Deputy Governor is for:", options:["2 years","3 years","4 years","5 years"], answer:1},
+
+{q:"Prior to becoming Deputy Governor, Rohit Jain served as:", options:["Chief General Manager","Executive Director of RBI","Principal Adviser","Regional Director"], answer:1},
+
+{q:"Prasoon Joshi was appointed Chairman of which autonomous public broadcasting organization?", options:["Press Information Bureau","CBFC","Prasar Bharati","NFDC"], answer:2},
+
+{q:"Prasoon Joshi succeeded whom as Chairman of Prasar Bharati?", options:["A. Surya Prakash","Navneet Kumar Sehgal","Jagdish Upasane","Gaurav Dwivedi"], answer:1},
+
+{q:"Prasar Bharati is India’s:", options:["Film Certification Authority","Public Service Broadcaster","Digital Media Regulator","Telecom Broadcasting Agency"], answer:1},
+
+{q:"Justice Anupinder Singh Grewal was appointed to which adjudicatory body dealing with insolvency and corporate disputes?", options:["NCLAT","DRT","NCLT","SAT"], answer:2},
+
+{q:"Justice Anupinder Singh Grewal previously served as a Judge of:", options:["Delhi High Court","Rajasthan High Court","Punjab & Haryana High Court","Allahabad High Court"], answer:2},
+
+{q:"Shashi Shekhar Vempati was appointed Chairperson of the Central Board of Film Certification (CBFC) for a tenure of:", options:["Two years","Three years","Four years","Five years"], answer:1},
+
+{q:"Shashi Shekhar Vempati succeeded whom as Chairperson of CBFC?", options:["Vivek Agnihotri","Prasoon Joshi","Navneet Sehgal","Pahlaj Nihalani"], answer:1},
+
+{q:"Priyanka Mittal, Director of KRBL Limited, was nominated by FICCI as Co-Chair of:", options:["India-UAE Business Council","Indo-US CEO Forum","Saudi-India Business Council (SIBC)","India-Africa Trade Council"], answer:2},
+
+{q:"Who was nominated as Chair of the Indian side of the Saudi-India Business Council (SIBC)?", options:["Harsha Vardhan Agarwal","Priyanka Mittal","Dr. Siddeek Ahmed","Rajesh Mehta"], answer:2},
+
+{q:"Lieutenant General (Retired) N. S. Raja Subramani was appointed as the ____ Chief of Defence Staff (CDS) of India.", options:["1st","2nd","3rd","4th"], answer:2},
+
+{q:"Vice Admiral Krishna Swaminathan was appointed as the 27th Chief of the Naval Staff (CNS), succeeding:", options:["Admiral Karambir Singh","Admiral R. Hari Kumar","Admiral Sunil Lanba","Admiral Dinesh Kumar Tripathi"], answer:3},
+
+];
+
+// ===============================
+// VARIABLES
+// ===============================
+
+let userAnswers = new Array(questions.length).fill(null);
+
+let markedForReview = new Array(questions.length).fill(false);
+
+let submitted = false;
+
+// ===============================
+// LOAD QUIZ
+// ===============================
+
+function loadQuiz(){
+
+    const quizDiv = document.getElementById("quiz");
+
+    questions.forEach((question,index)=>{
+
+        const qDiv = document.createElement("div");
+
+        qDiv.classList.add("question");
+
+        qDiv.id = `question_${index}`;
+
+        qDiv.innerHTML = `
+        <h3>Q${index+1}. ${question.q}</h3>
+        `;
+
+        question.options.forEach((option,optIndex)=>{
+
+            const opt = document.createElement("div");
+
+            opt.classList.add("option");
+
+            opt.innerText = option;
+
+            opt.onclick = ()=>selectOption(index,optIndex,opt);
+
+            opt.id = `q${index}_opt${optIndex}`;
+
+            qDiv.appendChild(opt);
+
+        });
+
+        // MARK BUTTON
+
+        const markBtn = document.createElement("button");
+
+        markBtn.innerText = "Mark For Review";
+
+        markBtn.classList.add("mark-btn");
+
+        markBtn.onclick = ()=>toggleMark(index,markBtn);
+
+        qDiv.appendChild(markBtn);
+
+        // CLEAR BUTTON
+
+        const clearBtn = document.createElement("button");
+
+        clearBtn.innerText = "Clear";
+
+        clearBtn.classList.add("clear-btn");
+
+        clearBtn.onclick = ()=>clearAnswer(index);
+
+        qDiv.appendChild(clearBtn);
+
+        quizDiv.appendChild(qDiv);
+
+    });
+
+}
+
+// ===============================
+// SELECT OPTION
+// ===============================
+
+function selectOption(qIndex,optIndex,element){
+
+    if(submitted) return;
+
+    userAnswers[qIndex] = optIndex;
+
+    const options = document.querySelectorAll(`[id^="q${qIndex}_opt"]`);
+
+    options.forEach(opt=>{
+        opt.classList.remove("selected");
+    });
+
+    element.classList.add("selected");
+
+}
+
+// ===============================
+// MARK FOR REVIEW
+// ===============================
+
+function toggleMark(index,button){
+
+    markedForReview[index] = !markedForReview[index];
+
+    const questionBox = document.getElementById(`question_${index}`);
+
+    if(markedForReview[index]){
+
+        button.classList.add("marked");
+
+        button.innerText = "Marked For Review";
+
+        questionBox.classList.add("review-marked");
+
+    }else{
+
+        button.classList.remove("marked");
+
+        button.innerText = "Mark For Review";
+
+        questionBox.classList.remove("review-marked");
+
+    }
+
+}
+
+// ===============================
+// CLEAR ANSWER
+// ===============================
+
+function clearAnswer(index){
+
+    if(submitted) return;
+
+    userAnswers[index] = null;
+
+    const options = document.querySelectorAll(`[id^="q${index}_opt"]`);
+
+    options.forEach(opt=>{
+        opt.classList.remove("selected");
+    });
+
+}
+
+// ===============================
+// SUBMIT QUIZ
+// ===============================
+
+function submitQuiz(){
+
+    if(submitted) return;
+
+    submitted = true;
+
+    clearInterval(timer);
+
+    let score = 0;
+
+    let correctCount = 0;
+    let wrongCount = 0;
+    let unansweredCount = 0;
+
+    questions.forEach((question,index)=>{
+
+        const userAns = userAnswers[index];
+
+        if(userAns === null){
+
+            unansweredCount++;
+
+        }
+        else if(userAns === question.answer){
+
+            score += 1;
+            correctCount++;
+
+        }
+        else{
+
+            score -= 0.25;
+            wrongCount++;
+
+        }
+
+    });
+
+    let attempted = correctCount + wrongCount;
+
+    let accuracy = attempted > 0
+    ? ((correctCount/attempted)*100).toFixed(2)
+    : 0;
+
+    document.body.innerHTML = `
+
+    <div class="container">
+
+        <div class="result-box">
+
+            <h1>Quiz Submitted ✅</h1>
+
+            <h2>Total Score: ${score.toFixed(2)}</h2>
+
+            <h3>Correct Answers: ${correctCount}</h3>
+
+            <h3>Wrong Answers: ${wrongCount}</h3>
+
+            <h3>Unanswered Questions: ${unansweredCount}</h3>
+
+            <h3>Accuracy: ${accuracy}%</h3>
+
+            <button class="review-btn" onclick="reviewAnswers()">
+            Review Answers
+            </button>
+
+            <div id="reviewSection"></div>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+// ===============================
+// REVIEW ANSWERS
+// ===============================
+
+function reviewAnswers(){
+
+    const reviewSection = document.getElementById("reviewSection");
+
+    let html = `<h1 style="margin-top:40px;">Review Section</h1>`;
+
+    questions.forEach((question,index)=>{
+
+        const userAns = userAnswers[index];
+
+        let status = "";
+        let marks = "";
+
+        if(userAns === null){
+
+            status = `<span class="unanswered">Unanswered</span>`;
+            marks = `0 Marks`;
+
+        }
+        else if(userAns === question.answer){
+
+            status = `<span class="correct">Correct ✅</span>`;
+            marks = `+1 Mark`;
+
+        }
+        else{
+
+            status = `<span class="wrong">Wrong ❌</span>`;
+            marks = `-0.25 Mark`;
+
+        }
+
+        html += `
+
+        <div class="review-question">
+
+            <h3>Q${index+1}. ${question.q}</h3>
+
+            <p>${status}</p>
+
+            <p><b>Marks:</b> ${marks}</p>
+
+            <p>
+            <b>Your Answer:</b>
+            ${
+                userAns === null
+                ? "Not Attempted"
+                : question.options[userAns]
+            }
+            </p>
+
+            <div class="correct-answer">
+            <b>Correct Answer:</b>
+            ${question.options[question.answer]}
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    reviewSection.innerHTML = html;
+
+}
+
+// ===============================
+// TIMER
+// ===============================
+
+let time = 1800;
+
+let timer;
+
+let isPaused = false;
+
+function startTimer(){
+
+    timer = setInterval(()=>{
+
+        if(!isPaused){
+
+            let minutes = Math.floor(time/60);
+
+            let seconds = time%60;
+
+            document.getElementById("timer").innerText =
+            `Time Left: ${minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
+
+            time--;
+
+            if(time < 0){
+
+                clearInterval(timer);
+
+                alert("Time is up! Quiz auto-submitted.");
+
+                submitQuiz();
+
+            }
+
+        }
+
+    },1000);
+
+}
+
+// ===============================
+// PAUSE TIMER
+// ===============================
+
+function pauseTimer(){
+
+    if(submitted) return;
+
+    isPaused = true;
+
+    document.getElementById("pauseBtn").disabled = true;
+
+    document.getElementById("resumeBtn").disabled = false;
+
+    // Disable options
+    document.querySelectorAll(".option").forEach(opt=>{
+        opt.classList.add("disabled-option");
+    });
+
+    // Disable buttons
+    document.querySelectorAll(".mark-btn, .clear-btn").forEach(btn=>{
+        btn.disabled = true;
+        btn.classList.add("disabled-btn");
+    });
+
+}
+// ===============================
+// RESUME TIMER
+// ===============================
+
+function resumeTimer(){
+
+    if(submitted) return;
+
+    isPaused = false;
+
+    document.getElementById("pauseBtn").disabled = false;
+
+    document.getElementById("resumeBtn").disabled = true;
+
+    // Enable options
+    document.querySelectorAll(".option").forEach(opt=>{
+        opt.classList.remove("disabled-option");
+    });
+
+    // Enable buttons
+    document.querySelectorAll(".mark-btn, .clear-btn").forEach(btn=>{
+        btn.disabled = false;
+        btn.classList.remove("disabled-btn");
+    });
+
+}
+// ===============================
+
+loadQuiz();
+
+startTimer();
+
+</script>
+
+</body>
+</html>
